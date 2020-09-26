@@ -97,8 +97,10 @@ class SnakeGame:
         self.keep_playing   = True
         self.snake_is_dead  = False
         self.direction      = None
+        self.is_direction_changed = False
 
         self.score_font = pygame.font.SysFont("calibri", 25)
+        self.location_modify = None
 
     @staticmethod
     def generate_random_location():
@@ -117,33 +119,41 @@ class SnakeGame:
         exit(0)
 
     def score_counter(self):
-        value = self.score_font.render(f"Your Score: {len(self.snake.links)}", True, Colors.white)
+        value = self.score_font.render(f"Score: {len(self.snake.links)}", True, Colors.white)
         self.disp.blit(value, [10,10])
 
+    def handle_event(self, evt):
+        # If the user attempts to close the game window
+        if evt.type == pygame.QUIT:
+            self.keep_playing = False
+
+        # If the user pressed a key
+        if evt.type == pygame.KEYDOWN and not self.is_direction_changed:
+            if evt.key == pygame.K_LEFT and self.direction != pygame.K_RIGHT:
+                self.direction = pygame.K_LEFT
+                self.is_direction_changed = True
+                self.location_modify = Location(-SNAKE_BLOCK_SIZE, 0)
+            if evt.key == pygame.K_RIGHT and self.direction != pygame.K_LEFT:
+                self.direction = pygame.K_RIGHT
+                self.is_direction_changed = True
+                self.location_modify = Location(SNAKE_BLOCK_SIZE, 0)
+            if evt.key == pygame.K_UP and self.direction != pygame.K_DOWN:
+                self.direction = pygame.K_UP
+                self.is_direction_changed = True
+                self.location_modify = Location(0, -SNAKE_BLOCK_SIZE)
+            if evt.key == pygame.K_DOWN and self.direction != pygame.K_UP:
+                self.direction = pygame.K_DOWN
+                self.is_direction_changed = True
+                self.location_modify = Location(0, SNAKE_BLOCK_SIZE)
+
     def game_loop(self):
-        location_modify = Location(0, 0)
+        self.location_modify = Location(0, 0)
 
         while self.keep_playing and not self.snake_is_dead:
+            self.is_direction_changed = False
+
             for evt in pygame.event.get():
-
-                # If the user attempts to close the game window
-                if evt.type == pygame.QUIT:
-                    self.keep_playing = False
-
-                # If the user pressed a key
-                if evt.type == pygame.KEYDOWN:
-                    if evt.key == pygame.K_LEFT and self.direction != pygame.K_RIGHT:
-                        self.direction = pygame.K_LEFT
-                        location_modify = Location(-SNAKE_BLOCK_SIZE, 0)
-                    if evt.key == pygame.K_RIGHT and self.direction != pygame.K_LEFT:
-                        self.direction = pygame.K_RIGHT
-                        location_modify = Location(SNAKE_BLOCK_SIZE, 0)
-                    if evt.key == pygame.K_UP and self.direction != pygame.K_DOWN:
-                        self.direction = pygame.K_UP
-                        location_modify = Location(0, -SNAKE_BLOCK_SIZE)
-                    if evt.key == pygame.K_DOWN and self.direction != pygame.K_UP:
-                        self.direction = pygame.K_DOWN
-                        location_modify = Location(0, SNAKE_BLOCK_SIZE)
+                self.handle_event(evt)
 
 
             if self.snake.head_loc == self.food_location:
@@ -151,7 +161,7 @@ class SnakeGame:
                 self.food_location = self.generate_random_location()
 
             # Update the snake's location
-            self.snake.head_loc = self.snake.head_loc + location_modify
+            self.snake.head_loc = self.snake.head_loc + self.location_modify
 
             if self.is_out_of_bounds(self.snake.head_loc) or self.snake.head_loc in self.snake.links[1:]:
                 print(f"Score: {len(self.snake.links)}")
