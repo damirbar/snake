@@ -85,22 +85,26 @@ class Snake:
 class SnakeGame:
 
     def __init__(self, snake_speed=30):
-        # Initialize the game window
+        self.disp                 = None
+        self.init_display()
+
+        self.snake                = Snake(Location(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
+        self.clock                = pygame.time.Clock()
+        self.snake_speed          = snake_speed
+        self.food_location        = self.generate_random_location()
+        self.keep_playing         = True
+        self.snake_is_dead        = False
+        self.direction            = None
+        self.is_direction_changed = False
+        self.location_modify      = None
+        self.score_font = pygame.font.SysFont("calibri", 25)
+
+
+    def init_display(self):
         pygame.init()
         self.disp = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.update()
         pygame.display.set_caption("Snake Game")
-        self.snake = Snake(Location(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
-        self.clock          = pygame.time.Clock()
-        self.snake_speed    = snake_speed
-        self.food_location  = self.generate_random_location()
-        self.keep_playing   = True
-        self.snake_is_dead  = False
-        self.direction      = None
-        self.is_direction_changed = False
-
-        self.score_font = pygame.font.SysFont("calibri", 25)
-        self.location_modify = None
 
     @staticmethod
     def generate_random_location():
