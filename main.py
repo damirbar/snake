@@ -98,6 +98,8 @@ class SnakeGame:
         self.snake_is_dead  = False
         self.direction      = None
 
+        self.score_font = pygame.font.SysFont("calibri", 25)
+
     @staticmethod
     def generate_random_location():
         return Location(
@@ -110,16 +112,19 @@ class SnakeGame:
         if loc.x < 0 or loc.y < 0 or loc.x > SCREEN_WIDTH or loc.y > SCREEN_HEIGHT:
             return True
 
-    def handle_snake_is_dead(self):
+    @staticmethod
+    def handle_snake_is_dead():
         exit(0)
-        pass
+
+    def score_counter(self):
+        value = self.score_font.render(f"Your Score: {len(self.snake.links)}", True, Colors.white)
+        self.disp.blit(value, [10,10])
 
     def game_loop(self):
         location_modify = Location(0, 0)
 
         while self.keep_playing and not self.snake_is_dead:
             for evt in pygame.event.get():
-                print(evt)
 
                 # If the user attempts to close the game window
                 if evt.type == pygame.QUIT:
@@ -142,17 +147,14 @@ class SnakeGame:
 
 
             if self.snake.head_loc == self.food_location:
-                print("Yum")
                 self.snake.add_link(self.snake.head_loc)
                 self.food_location = self.generate_random_location()
 
             # Update the snake's location
             self.snake.head_loc = self.snake.head_loc + location_modify
-            # print(self.snake.set_head_loc)
 
             if self.is_out_of_bounds(self.snake.head_loc) or self.snake.head_loc in self.snake.links[1:]:
                 print(f"Score: {len(self.snake.links)}")
-                print(f"Links: {[loc for loc in self.snake.links]}")
                 self.handle_snake_is_dead()
             else:
                 self.disp.fill(Colors.black)
@@ -163,6 +165,7 @@ class SnakeGame:
                     pygame.draw.rect(self.disp, Colors.green,
                                  [link.x, link.y, SNAKE_BLOCK_SIZE, SNAKE_BLOCK_SIZE])
 
+                self.score_counter()
                 pygame.display.update()
 
                 # Refresh rate according to the selected snake speed
