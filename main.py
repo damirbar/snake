@@ -15,11 +15,12 @@ SNAKE_HIGH_SCORE_PATH = './.snake_high_score'
 
 # Colors
 class Colors:
-    red   = (255,0,0)
-    green = (0,255,0)
-    blue  = (0,0,255)
-    white = (255,255,255)
-    black = (0,0,0)
+    red        = (255,0,0)
+    green      = (0,255,0)
+    dark_green = (0,200,0)
+    blue       = (0,0,255)
+    white      = (255,255,255)
+    black      = (0,0,0)
 
 
 class Location:
@@ -217,7 +218,9 @@ class SnakeGame:
                 pygame.draw.rect(self.disp, Colors.red,
                                  [self.food_location.x, self.food_location.y, SNAKE_BLOCK_SIZE, SNAKE_BLOCK_SIZE])
 
-                for link in self.snake.links:
+                pygame.draw.rect(self.disp, Colors.dark_green,
+                             [self.snake.links[0].x, self.snake.links[0].y, SNAKE_BLOCK_SIZE, SNAKE_BLOCK_SIZE])
+                for link in self.snake.links[1:]:
                     pygame.draw.rect(self.disp, Colors.green,
                                  [link.x, link.y, SNAKE_BLOCK_SIZE, SNAKE_BLOCK_SIZE])
 
